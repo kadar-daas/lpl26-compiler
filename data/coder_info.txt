@@ -1,0 +1,3 @@
+Name: Albert Einstein
+Student number: 123456789
+Email: albert.einstein.13@city.ac.uk
