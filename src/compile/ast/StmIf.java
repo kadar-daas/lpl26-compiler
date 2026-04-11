@@ -2,15 +2,28 @@ package compile.ast;
 
 import compile.SymbolTable;
 
-/* Placeholder. Replace with your own code (see Tutorial 2 solutions). */
-
 public class StmIf extends Stm {
+    public final Exp condition;
+    public final Stm trueBranch;
+    public final Stm falseBranch;
 
-    public StmIf(Exp e, Stm s1, Stm s2) { }
+    public StmIf(Exp condition, Stm trueBranch, Stm falseBranch) {
+        this.condition = condition;
+        this.trueBranch = trueBranch;
+        this.falseBranch = falseBranch;
+    }
 
     @Override
     public void compile(SymbolTable st) {
-        throw new RuntimeException("not yet implemented");
-    }
+        String elseLabel = st.freshLabel("if_else");
+        String endLabel  = st.freshLabel("if_end");
 
+        condition.compile(st);
+        emit("jumpi_z " + elseLabel);
+        trueBranch.compile(st);
+        emit("jumpi " + endLabel);
+        emit(elseLabel + ":");
+        falseBranch.compile(st);
+        emit(endLabel + ":");
+    }
 }

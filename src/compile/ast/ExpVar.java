@@ -11,7 +11,19 @@ public class ExpVar extends Exp {
 
     @Override
     public void compile(SymbolTable st) {
-        emit("loadi " + "$" + name);
+        Integer offset = st.resolveOffset(name);
+        if (offset != null) {
+            emit("get_fp");
+            if (offset >= 0) {
+                emit("push " + offset);
+                emit("add");
+            } else {
+                emit("push " + (-offset));
+                emit("sub");
+            }
+            emit("load");
+        } else {
+            emit("loadi $" + name);
+        }
     }
-
 }

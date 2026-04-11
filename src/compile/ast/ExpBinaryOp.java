@@ -18,24 +18,57 @@ public class ExpBinaryOp extends Exp {
         left.compile(st);
         right.compile(st);
         switch (operator) {
-            case "*":
-                emit("mul");
+            case "+":
+                emit("add");
                 return;
             case "-":
                 emit("sub");
                 return;
-            case "+":
-                emit("add");
+            case "*":
+                emit("mul");
                 return;
+            case "/":
+                emit("div");
+                return;
+
+            case "==":
+                emit("sub", "test_z");
+                return;
+
             case "<":
                 emit("sub", "test_n");
                 return;
-            case "==":
-                emit("sub", "test_z");
+
+            case ">":
+                emit("swap", "sub", "test_n");
+                return;
+
+            case "<=":
+                emit("swap", "sub", "test_n");
+                emit("push 0", "swap", "sub", "test_z");
+                return;
+
+            case ">=":
+                emit("sub", "test_n");
+                emit("push 0", "swap", "sub", "test_z");
+                return;
+
+            case "&&":
+                emit("test_z");
+                emit("push 0", "swap", "sub", "test_z");
+                emit("swap");
+                emit("test_z");
+                emit("push 0", "swap", "sub", "test_z");
+                emit("mul");
+                return;
+
+            case "||":
+                emit("add");
+                emit("test_z");
+                emit("push 0", "swap", "sub", "test_z");
                 return;
             default:
                 throw new IllegalStateException("Unrecognised binary operator: " + operator);
         }
     }
-
 }

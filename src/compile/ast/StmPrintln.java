@@ -3,8 +3,7 @@ package compile.ast;
 import compile.SymbolTable;
 
 public class StmPrintln extends Stm {
-
-    public final Exp exp;
+    public final Exp exp; // null means println()
 
     public StmPrintln(Exp exp) {
         this.exp = exp;
@@ -12,9 +11,10 @@ public class StmPrintln extends Stm {
 
     @Override
     public void compile(SymbolTable st) {
-        exp.compile(st);
-        emit("sysc OUT_DEC");
+        if (exp != null) {
+            exp.compile(st);
+            emit("sysc OUT_DEC");
+        }
         emit("sysc OUT_LN");
     }
-
 }

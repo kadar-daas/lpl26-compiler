@@ -1,42 +1,46 @@
 package compile.ast;
 
 import compile.SymbolTable;
-
 import java.util.List;
 
 public class Program extends AST {
-
+    public final List<RecordDef> recordDefs;
     public final List<VarDecl> globals;
     public final List<Stm> body;
+    public final List<MethodDef> methods;
 
-    /**
-     * Initialise a new Program AST.
-     * @param globals the global variable declarations
-     * @param body the statements in the main body of the program
-     */
-    public Program(List<VarDecl> globals, List<Stm> body) {
+    public Program(List<RecordDef> recordDefs, List<VarDecl> globals,
+                   List<Stm> body, List<MethodDef> methods) {
+        this.recordDefs = List.copyOf(recordDefs);
         this.globals = List.copyOf(globals);
         this.body = List.copyOf(body);
+        this.methods = List.copyOf(methods);
     }
 
-    /**
-     * Emit SSM assembly code for this program.
-     */
     public void compile() {
         SymbolTable st = new SymbolTable(this);
 
-        for (VarDecl global: globals) {
-            global.compile(st);
+        for (RecordDef rd : recordDefs) {
+            rd.compile(st);
         }
-        for(Stm stm: body) {
+
+        st.enterMainBody();
+
+        for (Stm stm : body) {
             stm.compile(st);
         }
+
+        st.exitMainBody();
+
         emit("halt");
 
+        for (MethodDef method : methods) {
+            method.compile(st);
+        }
+
         emit(".data");
-        for (VarDecl global: st.getGlobals()) {
+        for (VarDecl global : st.getGlobals()) {
             emit("$" + global.name + ": 0");
         }
     }
-
 }
